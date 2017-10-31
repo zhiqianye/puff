@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<probe type="it_device_status" version="1.0.0" multi-instance="false">
+    <!-- 约束一个探针仅支持一个业务 -->
+    <!-- 名字 -->
+    <name>IT探针</name>
+    <!-- 描述 -->
+    <description>用于巡检IT设备的探针，支持设备类型：服务器、交换机、路由器和猎鹰集群</description>
+    <!-- 提供者 -->
+    <provider>共享运维</provider>
+    <scheduleType>clocked</scheduleType>
+    <services>
+        <service id="it_device_status" class="com.hikvision.nms.xxx">
+            <!-- 巡检输入 -->
+            <!--    基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义    key可选，未填写表示全部字段，填写表示指定字段  -->
+            <inputs>
+                <input resource="resource_it_server" key="id,ip,port,community" />
+                <input resource="阿士大夫" />
+                <input resource="asdf" />
+            </inputs>
+            <!-- 巡检输出 -->
+            <!--    number, string, date, list    -->
+            <outputs>
+                <output key="errorCode" type="enum">
+                    <item key="0" type="string" />
+                    <item key="1" type="string" />
+                </output>
+                <output key="cause" type="string" />
+                <output key="indexCode" type="string" />
+                <output key="updateTime" type="date" />
+                <output key="p1" type="string" />
+                <output key="p2" type="list">
+                    <item key="p21" type="string" />
+                    <item key="p22" type="string" />
+                </output>
+            </outputs>
+            <!-- 配置模型 -->
+            <!--    number, string, date, multi, single    -->
+            <configs>
+                <config key="inspectDay" type="number" default="5" displayKey="probe.config.it_device_status.inspectDay" rule="" warning="" />
+                <config key="15Check" type="multi" default="key1,key2" displayKey="probe.config.it_device_status.15Check" rule="" warning="">
+                    <item key="key1" displayKey="probe.config.record.15Check.key1" />
+                    <item key="key2" displayKey="probe.config.record.15Check.key2" />
+                    <item key="key3" displayKey="probe.config.record.15Check.key3" />
+                </config>
+                <config key="checkType" type="single" default="key1" displayKey="probe.config.it_device_status.checkType" rule="" warning="">
+                    <item key="key1" displayKey="probe.config.record.checkType.key1" />
+                    <item key="key2" displayKey="probe.config.record.checkType.key2" />
+                </config>
+            </configs>
+        </service>
+    </services>
+    <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->
+    <events>
+        <event name="SnmpTrap" port="161" />
+    </events>
+</probe>
