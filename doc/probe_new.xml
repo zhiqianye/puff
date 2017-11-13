@@ -1,56 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<probe type="it_device_status" version="1.0.0" multi-instance="false">
-    <!-- 约束一个探针仅支持一个业务 -->
+<model id="it_device_status" version="1.0.0">
     <!-- 名字 -->
     <name>IT探针</name>
     <!-- 描述 -->
     <description>用于巡检IT设备的探针，支持设备类型：服务器、交换机、路由器和猎鹰集群</description>
     <!-- 提供者 -->
     <provider>共享运维</provider>
-    <scheduleType>clocked</scheduleType>
-    <services>
-        <service id="it_device_status" class="com.hikvision.nms.xxx">
-            <!-- 巡检输入 -->
-            <!--    基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义    key可选，未填写表示全部字段，填写表示指定字段  -->
-            <inputs>
-                <input resource="resource_it_server" key="id,ip,port,community" />
-                <input resource="阿士大夫" />
-                <input resource="asdf" />
-            </inputs>
-            <!-- 巡检输出 -->
-            <!--    number, string, date, list    -->
-            <outputs>
-                <output key="errorCode" type="enum">
-                    <item key="0" type="string" />
-                    <item key="1" type="string" />
-                </output>
-                <output key="cause" type="string" />
-                <output key="indexCode" type="string" />
-                <output key="updateTime" type="date" />
-                <output key="p1" type="string" />
-                <output key="p2" type="list">
-                    <item key="p21" type="string" />
-                    <item key="p22" type="string" />
-                </output>
-            </outputs>
-            <!-- 配置模型 -->
-            <!--    number, string, date, multi, single    -->
+    <!-- 探针服务集 -->
+    <abilities>
+        <ability id="encodeDevice">
+            <!-- 能力输入 -->
+            <!-- 基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义-->
+            <input resource="encodeDevice">
+                <!-- 采集所需的指定字段  -->
+                <property key="indexCode"/>
+                <property key="userName"/>
+                <property key="password"/>
+            </input>
+
+            <!-- 能力输出 -->
+            <!-- number, string, object, array[*] -->
+            <output>
+                <property key="code"  type="number" rule="0-正常，其他-异常" description="错误码"/>
+                <property key="msg"  type="string" rule="" description="错误码描述"/>
+                <property key="data"  type="object" rule="" description="数据">
+                    <property key="pageNo"  type="number" rule="大于0的整数" description="页码"/>
+                    <property key="pageSize"  type="number" rule="大于0的整数" description="页大小"/>
+                    <property key="total"  type="number" rule="大于等于0的整数" description="总数据量"/>
+                    <property key="list"  type="array[object]" rule="" description="数据列表">
+                        <property key="indexCode"  type="string" rule="" description="唯一标识"/>
+                        <property key="online"  type="number" rule="0-离线，1-在线，2-采集失败" description="在线状态"/>
+                    </property>
+                </property>
+            </output>
+
+            <!-- 配置 -->
+            <!-- 基本项：number, string, boolean, date -->
+            <!-- 复合项：someOf, oneOf, range    -->
             <configs>
-                <config key="inspectDay" type="number" default="5" displayKey="probe.config.it_device_status.inspectDay" rule="" warning="" />
-                <config key="15Check" type="multi" default="key1,key2" displayKey="probe.config.it_device_status.15Check" rule="" warning="">
-                    <item key="key1" displayKey="probe.config.record.15Check.key1" />
-                    <item key="key2" displayKey="probe.config.record.15Check.key2" />
-                    <item key="key3" displayKey="probe.config.record.15Check.key3" />
+
+                <config key="someNumberKey" type="number" value="5" displayKey="model.config.encodeDevice.someNumberKey" rule="" description="描述这个整形" />
+
+                <config key="someStringKey" type="string" value="阿士大夫" displayKey="model.config.encodeDevice.someStringKey" rule="" description="描述这个字符串" />
+
+                <config key="someBooleanKey" type="boolean" value="true'" displayKey="model.config.encodeDevice.someBooleanKey" rule="" description="描述这个布尔" />
+
+                <config key="someDateKey" type="date" value="2017-11-06 16:22:36" displayKey="model.config.encodeDevice.someDateKey" rule="" description="描述这个日期" />
+                
+                <config key="oneOfKey" type="oneOf" value="C" displayKey="model.config.encodeDevice.oneOfKey" rule="" description="描述这个单选">
+                    <item key="A" type="string" value="aaaaaaaaaaaaaaaaaaa" displayKey="model.config.encodeDevice.oneOfKey.A" />
+                    <item key="B" type="string" value="bbbbbbbbbbbbbbbbbbb" displayKey="model.config.encodeDevice.oneOfKey.B" />
+                    <item key="C" type="string" value="三长一短选最短" displayKey="model.config.encodeDevice.oneOfKey.C" />
+                    <item key="D" type="string" value="ddddddddddddddddddd" displayKey="model.config.encodeDevice.oneOfKey.D" />
                 </config>
-                <config key="checkType" type="single" default="key1" displayKey="probe.config.it_device_status.checkType" rule="" warning="">
-                    <item key="key1" displayKey="probe.config.record.checkType.key1" />
-                    <item key="key2" displayKey="probe.config.record.checkType.key2" />
+
+                <config key="someOfKey" type="someOf" subType="string" value="A,B,C" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个多选">
+                    <item key="A" type="string" value="B说得对" displayKey="model.config.encodeDevice.someOfKey.A" />
+                    <item key="B" type="string" value="A说得对" displayKey="model.config.encodeDevice.someOfKey.B" />
+                    <item key="C" type="string" value="A和B说的都对" displayKey="model.config.encodeDevice.someOfKey.C" />
+                    <item key="D" type="number" value="11.11" displayKey="model.config.encodeDevice.someOfKey.D" />
                 </config>
+
+                <config key="rangeKey" type="range" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个区间">
+                    <item key="base" type="date" value="now" displayKey="model.config.encodeDevice.someOfKey.base" />
+                    <item key="offset" type="number" value="-1" displayKey="model.config.encodeDevice.someOfKey.offset" />
+                    <item key="length" type="number" value="1" displayKey="model.config.encodeDevice.someOfKey.length" />
+                </config>
+
             </configs>
-        </service>
-    </services>
-    <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->
-    <events>
-        <event name="SnmpTrap" port="161" />
-    </events>
-</probe>
+
+            <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->
+            <events>
+                <event name="SnmpTrap" port="161" />
+            </events>
+        </ability>
+    </abilities>
+    
+</model>
