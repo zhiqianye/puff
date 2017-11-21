@@ -11,7 +11,7 @@
         <ability id="encodeDevice">
             <!-- 能力输入 -->
             <!-- 基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义-->
-            <input resource="encodeDevice">
+            <input resourceType="encodeDevice">
                 <!-- 采集所需的指定字段  -->
                 <property key="indexCode"/>
                 <property key="userName"/>
@@ -54,25 +54,29 @@
                     <item key="D" type="string" value="ddddddddddddddddddd" displayKey="model.config.encodeDevice.oneOfKey.D" />
                 </config>
 
-                <config key="someOfKey" type="someOf" subType="string" value="A,B,C" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个多选">
+                <config key="someOfKey" type="someOf" value="A,B,C" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个多选">
                     <item key="A" type="string" value="B说得对" displayKey="model.config.encodeDevice.someOfKey.A" />
                     <item key="B" type="string" value="A说得对" displayKey="model.config.encodeDevice.someOfKey.B" />
                     <item key="C" type="string" value="A和B说的都对" displayKey="model.config.encodeDevice.someOfKey.C" />
                     <item key="D" type="number" value="11.11" displayKey="model.config.encodeDevice.someOfKey.D" />
                 </config>
 
+                <!-- 包含固定的三个字段，base，offset和length。计算方式：base,offset->from(to), from(to),length->to(from) -->
                 <config key="rangeKey" type="range" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个区间">
+                    <!-- 可偏移类型，为date时可以选择特殊值now表示今天 -->
                     <item key="base" type="date" value="now" displayKey="model.config.encodeDevice.someOfKey.base" />
+                    <!-- 偏移量，固定number类型 -->
                     <item key="offset" type="number" value="-1" displayKey="model.config.encodeDevice.someOfKey.offset" />
+                    <!-- 区间覆盖长度，固定number类型 -->
                     <item key="length" type="number" value="1" displayKey="model.config.encodeDevice.someOfKey.length" />
                 </config>
 
             </configs>
 
             <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->
-            <events>
-                <event name="SnmpTrap" port="161" />
-            </events>
+            <proxies>
+                <proxy name="SnmpTrap" port="161" />
+            </proxies>
         </ability>
     </abilities>
     

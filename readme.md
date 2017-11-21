@@ -58,42 +58,89 @@
 探针模型是探针元数据，用于描述探针的名称，功能，所需资源类型，配置项以及输出信息。下面是录像探针的模型示例：
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<probe type="record" version="1.0.0"> 
-<!-- 约束一个探针仅支持一个业务 -->  
-  <!-- 名字 -->  
-  <name>录像探针</name>  
-  <!-- 描述 -->  
-  <description>用于巡检监控点录像完整情况的探针，支持设备类型：监控点</description>  
-  <!-- 提供者 -->  
-  <provider>共享运维</provider>
-  <!-- 巡检输入 -->  
-  <!--
-    基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义
-    key可选，未填写表示全部字段，填写表示指定字段
-  -->
-  <inputs>
-    <input resource="camera" key="indexCode"/> 
-  </inputs>
-  <!-- 巡检输出 -->
-  <!--
-    number, string, date, list
-    -->
-  <outputs>
-  </outputs>
-    <!-- 配置模型 -->  
-    <!--
-    number, string, date, multi, single
-    -->
-    <configs> 
-     <config key="recordConfig" type="dateoffset" default="1" displayKey="probe.config.record.recordConfig">
-		</config>
-    </configs>
+<?xml version="1.0" encoding="utf-8"?>
+<model id="it_device_status" version="1.0.0">
+    <!-- 名字 -->
+    <name>IT探针</name>
+    <!-- 描述 -->
+    <description>用于巡检IT设备的探针，支持设备类型：服务器、交换机、路由器和猎鹰集群</description>
+    <!-- 提供者 -->
+    <provider>共享运维</provider>
+    <!-- 探针服务集 -->
+    <abilities>
+        <ability id="encodeDevice">
+            <!-- 能力输入 -->
+            <!-- 基础资源类型为与核心服务保持一致，事业部特殊业务资源类型按照规范定义-->
+            <input resourceType="encodeDevice">
+                <!-- 采集所需的指定字段  -->
+                <property key="indexCode"/>
+                <property key="userName"/>
+                <property key="password"/>
+            </input>
 
-    <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->  
-    <events>
-    </events>
-</probe>
+            <!-- 能力输出 -->
+            <!-- number, string, object, array[*] -->
+            <output>
+                <property key="code"  type="number" rule="0-正常，其他-异常" description="错误码"/>
+                <property key="msg"  type="string" rule="" description="错误码描述"/>
+                <property key="data"  type="object" rule="" description="数据">
+                    <property key="pageNo"  type="number" rule="大于0的整数" description="页码"/>
+                    <property key="pageSize"  type="number" rule="大于0的整数" description="页大小"/>
+                    <property key="total"  type="number" rule="大于等于0的整数" description="总数据量"/>
+                    <property key="list"  type="array[object]" rule="" description="数据列表">
+                        <property key="indexCode"  type="string" rule="" description="唯一标识"/>
+                        <property key="online"  type="number" rule="0-离线，1-在线，2-采集失败" description="在线状态"/>
+                    </property>
+                </property>
+            </output>
+
+            <!-- 配置 -->
+            <!-- 基本项：number, string, boolean, date -->
+            <!-- 复合项：someOf, oneOf, range    -->
+            <configs>
+
+                <config key="someNumberKey" type="number" value="5" displayKey="model.config.encodeDevice.someNumberKey" rule="" description="描述这个整形" />
+
+                <config key="someStringKey" type="string" value="阿士大夫" displayKey="model.config.encodeDevice.someStringKey" rule="" description="描述这个字符串" />
+
+                <config key="someBooleanKey" type="boolean" value="true'" displayKey="model.config.encodeDevice.someBooleanKey" rule="" description="描述这个布尔" />
+
+                <config key="someDateKey" type="date" value="2017-11-06 16:22:36" displayKey="model.config.encodeDevice.someDateKey" rule="" description="描述这个日期" />
+                
+                <config key="oneOfKey" type="oneOf" value="C" displayKey="model.config.encodeDevice.oneOfKey" rule="" description="描述这个单选">
+                    <item key="A" type="string" value="aaaaaaaaaaaaaaaaaaa" displayKey="model.config.encodeDevice.oneOfKey.A" />
+                    <item key="B" type="string" value="bbbbbbbbbbbbbbbbbbb" displayKey="model.config.encodeDevice.oneOfKey.B" />
+                    <item key="C" type="string" value="三长一短选最短" displayKey="model.config.encodeDevice.oneOfKey.C" />
+                    <item key="D" type="string" value="ddddddddddddddddddd" displayKey="model.config.encodeDevice.oneOfKey.D" />
+                </config>
+
+                <config key="someOfKey" type="someOf" value="A,B,C" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个多选">
+                    <item key="A" type="string" value="B说得对" displayKey="model.config.encodeDevice.someOfKey.A" />
+                    <item key="B" type="string" value="A说得对" displayKey="model.config.encodeDevice.someOfKey.B" />
+                    <item key="C" type="string" value="A和B说的都对" displayKey="model.config.encodeDevice.someOfKey.C" />
+                    <item key="D" type="number" value="11.11" displayKey="model.config.encodeDevice.someOfKey.D" />
+                </config>
+
+                <!-- 包含固定的三个字段，base，offset和length。计算方式：base,offset->from(to), from(to),length->to(from) -->
+                <config key="rangeKey" type="range" displayKey="model.config.encodeDevice.someOfKey" rule="" description="描述这个区间">
+                    <!-- 可偏移类型，为date时可以选择特殊值now表示今天 -->
+                    <item key="base" type="date" value="now" displayKey="model.config.encodeDevice.someOfKey.base" />
+                    <!-- 偏移量，固定number类型 -->
+                    <item key="offset" type="number" value="-1" displayKey="model.config.encodeDevice.someOfKey.offset" />
+                    <!-- 区间覆盖长度，固定number类型 -->
+                    <item key="length" type="number" value="1" displayKey="model.config.encodeDevice.someOfKey.length" />
+                </config>
+
+            </configs>
+
+            <!-- 监听事件名，用于巡检信息主动上报时PAS进行消息分发 -->
+            <proxies>
+                <proxy name="SnmpTrap" port="161" />
+            </proxies>
+        </ability>
+    </abilities>
+    
+</model>
 ```
 
 #### 2.2.2 心跳
@@ -189,17 +236,22 @@ foo
 
 计划实体设计：
 
-| 属性           | 说明                      |
-| ------------ | ----------------------- |
-| id           | 计划ID                    |
-| name         | 计划名称                    |
-| resourceType | 计划关联的资源类型，例如编码设备，监控点等   |
-| serviceId    | 计划关联的服务ID，例如状态巡检，录像巡检等  |
-| timeType     | 计划的时间特性，1实时，2定时         |
-| state        | 计划状态，ENABLE启用，DISABLE禁用 |
-| template     | 时间模板，标识计划的起作用的时间段       |
-| cron         | 等同于template             |
-| createTime   | 创建时间                    |
+| 属性           | 说明                                       |
+| ------------ | ---------------------------------------- |
+| id           | 计划ID                                     |
+| name         | 计划名称                                     |
+| originSystem | 来源系统                                     |
+| planState    | 计划状态。ENABLE-启用，DISABLE-禁用                |
+| modelId      | 探针模型ID，来源于探针模型                           |
+| modelVersion | 探针模型版本                                   |
+| abilityId    | 探针模型的能力ID，来源于探针模型                        |
+| resourceMode | 资源模式。TYPE-按类型采集，TARGETS-按指定资源采集          |
+| scheduleType | 调度类型。DISPOSABLE-一次性调度，CLOCKED-定时调度，PERIODIC-周期调度，BEST_EFFORT-尽力而为实时调度 |
+| period       | 任务周期，正整数，单位s，scheduleType=PERIODIC时有效    |
+| resources    | 资源id组，resourceMode=TARGETS时有效            |
+| timeTemplate | 计划时间模板，必须保证数组为7个元素，代表每周7天，顺序为周一到周日       |
+| configs      | 配置组                                      |
+
 
 
 
